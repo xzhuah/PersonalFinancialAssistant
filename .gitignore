@@ -4,3 +4,5 @@ venv\*
 venv
 *.xml
 *.iml
+readMode.pkl
+writeMode.pkl
