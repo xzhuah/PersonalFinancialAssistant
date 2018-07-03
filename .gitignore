@@ -1,0 +1,6 @@
+.idea\*
+venv\*
+.idea
+venv
+*.xml
+*.iml
