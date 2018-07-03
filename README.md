@@ -9,7 +9,7 @@ This would be a web application aims at helping people recording their daily tra
 
 This is a secure program. It allows you to 
 
-* use your own mongodb database with login information maintained by yourself
+* use your own <a href="https://www.mongodb.com/cloud/atlas">mongodb database</a> with login information maintained by yourself
 * encrypt all your database message with your own password
 	* each if someone managed to get into your database, he won't read your data
 
@@ -18,7 +18,7 @@ This is a secure program based on
 
 * <a href="https://www.djangoproject.com/">Django Python web framework</a>
 	* We use the same framework as The National Aeronautics and Space Administration (NASA)
-* Encryption module from SecPyRender
+* Encryption module from <a href="https://github.com/xzhuah/SecPyRender">SecPyRender</a>
 	* Build upon Advanced Encryption Standard (AES) with 256 bit hash and random generated initialization vector
 
 
