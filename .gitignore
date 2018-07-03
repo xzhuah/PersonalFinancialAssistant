@@ -6,6 +6,4 @@ venv
 *.iml
 readMode.pkl
 writeMode.pkl
-*.xml
-*.iml
-*.xml
+*.pyc
