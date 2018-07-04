@@ -31,7 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'recorderApp.apps.RecorderappConfig',
     'reviewerApp.apps.ReviewerappConfig',
     'django.contrib.admin',
     'django.contrib.auth',

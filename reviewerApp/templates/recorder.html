@@ -1,0 +1,61 @@
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script>
+
+var date = new Date();
+var day = date.getDate();
+var month = date.getMonth() + 1;
+var year = date.getFullYear();
+if (month < 10) month = "0" + month;
+if (day < 10) day = "0" + day;
+var today = year + "-" + month + "-" + day;
+
+
+ if (!String.format) {
+  String.format = function(format) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    return format.replace(/{(\d+)}/g, function(match, number) {
+      return typeof args[number] != 'undefined'
+        ? args[number]
+        : match
+      ;
+    });
+  };
+}
+        var varCount = 1;
+        $(function () {
+            $('#addVar').on('click', function(){
+                $node = String.format('<p><label>Transaction {0}: </label><label for="time{0}" >Time:</label> <input type="date" name="time" id="time{0}" value="{1}"> <input type="radio" name="Pay{0}" value="pay" checked> <label >Pay </label><input type="radio" name="Pay{0}" value="gain"> <label >Gain </label><label for="amount{0}" >Amount:</label> <input type="number" name="amount" id="amount{0}"> <label for="tags{0}" >Tags(split by ;)</label> <input type="text" name="tags" id="tags{0}"> <label for="description{0}" >Memo:</label> <input type="text" name="description" id="description{0}"></p>',varCount,today);
+
+                varCount++;
+                $("#myTd").append($node);
+            });
+        });
+</script>
+
+<div id="container">
+  <form id="transaction_record" method="post" action={% url 'reviewerApp:add_txs' %}>{% csrf_token %}
+    <table id="myTable">
+      <tr>
+        <td id="myTd">
+          <p><label>Transaction 0: </label>
+              <label for="time0" >Time:</label> <input type="date" name="time" id="time0">
+              <input type="radio" name="Pay0" value="pay" checked> <label >Pay </label>
+              <input type="radio" name="Pay0" value="gain"> <label >Gain </label>
+              <label for="amount0" >Amount:</label> <input type="number" name="amount" id="amount0">
+              <label for="tags0" >Tags(split by ;)</label> <input type="text" name="tags" id="tags0">
+              <label for="description0" >Memo:</label> <input type="text" name="description" id="description0">
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input id="addVar" type="button" value="add a transaction"/>
+          <input type="submit" value="submit" style="float:right"/>
+        </td>
+      </tr>
+    </table>
+  </form>
+</div>
+ <script>
+     document.getElementById("time0").value = today;
+ </script>

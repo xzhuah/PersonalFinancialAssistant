@@ -1,0 +1,11 @@
+{% if all_transaction %}
+    <ul>
+    {% for transaction in all_transaction %}
+        <li>{{transaction.id  }}{{ transaction }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No transactions are available.</p>
+
+{% endif %}
+<a href="../record/">Add Transactions</a>
