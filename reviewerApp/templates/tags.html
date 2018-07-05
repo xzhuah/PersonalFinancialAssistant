@@ -1,0 +1,8 @@
+{% load filters %}
+{% for tag in transaction.value.tags %}
+    {% if filtered %}
+    <span class="label {{ tag|get_style}}"> <span class="{{ tag|get_icon }}" aria-hidden="true"></span> {{ tag }}</span>
+    {% else %}
+    <a href="./list_cata/{{ tag }}"><span class="label {{ tag|get_style}}"> <span class="{{ tag|get_icon }}" aria-hidden="true"></span> {{ tag }}</span></a>
+    {% endif %}
+{% endfor %}

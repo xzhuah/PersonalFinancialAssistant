@@ -40,7 +40,20 @@ class Transaction(ObjPrototype):
         self.id = id
 
     def get_time(self):
-        return datetime.datetime.fromtimestamp(self.obj["timestamp"])
+        the_time = datetime.datetime.fromtimestamp(self.obj["timestamp"])
+        return str(the_time.year)+"-"+str(the_time.month)+"-"+str(the_time.day)
+
+    def get_date(self):
+        the_time = datetime.datetime.fromtimestamp(self.obj["timestamp"])
+        return str(the_time.day)
+
+    def get_month(self):
+        the_time = datetime.datetime.fromtimestamp(self.obj["timestamp"])
+        return str(the_time.month)
+
+    def get_year(self):
+        the_time = datetime.datetime.fromtimestamp(self.obj["timestamp"])
+        return str(the_time.year)
 
     def __repr__(self):
         return "Time: {0}, Amount: ${1}, Tags: {2}, Description: {3}".\

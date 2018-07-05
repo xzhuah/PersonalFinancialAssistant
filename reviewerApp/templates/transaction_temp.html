@@ -1,0 +1,25 @@
+<tr class="text-center">
+<td>${{ transaction.value.amount }}</td>
+<td>{{ transaction.value.timestamp }}</td>
+
+
+    <td>{% include "./tags.html" %}</td>
+
+
+<td>{{ transaction.value.description }}</td>
+{% if not filtered %}
+    <td>
+        <form action="./del/" method="POST">{% csrf_token %}
+            <input type="hidden" name="oid" value="{{ transaction.key }}">
+            <input type="submit" name="submit" value="Delete">
+        </form>
+    </td>
+{% else %}
+    <td>
+        <form action="../../del/" method="POST">{% csrf_token %}
+            <input type="hidden" name="oid" value="{{ transaction.key }}">
+            <input type="submit" name="submit" value="Delete">
+        </form>
+    </td>
+{% endif %}
+</tr>

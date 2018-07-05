@@ -1,5 +1,8 @@
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-<script>
+<html>
+<head>
+     {% include "./header.html" %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script>
 
 var date = new Date();
 var day = date.getDate();
@@ -24,38 +27,69 @@ var today = year + "-" + month + "-" + day;
         var varCount = 1;
         $(function () {
             $('#addVar').on('click', function(){
-                $node = String.format('<p><label>Transaction {0}: </label><label for="time{0}" >Time:</label> <input type="date" name="time" id="time{0}" value="{1}"> <input type="radio" name="Pay{0}" value="pay" checked> <label >Pay </label><input type="radio" name="Pay{0}" value="gain"> <label >Gain </label><label for="amount{0}" >Amount:</label> <input type="number" name="amount" id="amount{0}"> <label for="tags{0}" >Tags(split by ;)</label> <input type="text" name="tags" id="tags{0}"> <label for="description{0}" >Memo:</label> <input type="text" name="description" id="description{0}"></p>',varCount,today);
-
+                $node = String.format('<p><label>Transaction {0}: </label>               <label for="time{0}" >Time:</label> <input type="date" name="time" id="time{0}" value="{1}">               <input type="radio" name="Pay{0}" value="pay" checked > <label >Pay </label>               <input type="radio" name="Pay{0}" value="gain" > <label >Gain </label>               <input type="number" id="amount{0}" name="amount" placeholder="$12.3">               <label for="tags{0}" >Tags</label>               <select name="tags">                 <option value="food" selected="selected">food</option>                 <option value="necessities">necessities</option>                 <option value="transportation" >transportation</option>                 <option value="entertainment">entertainment</option>                 <option value="education" >education</option>                 <option value="investment">investment</option>                 <option value="salary" >salary</option>                 <option value="medical">medical</option>                 <option value="other" >other</option>               </select>               <label for="description{0}" >Memo:</label> <input type="text" name="description" id="description{0}" value="">              </p>',varCount,today);
                 varCount++;
                 $("#myTd").append($node);
             });
         });
 </script>
+</head>
+<body>
 
-<div id="container">
-  <form id="transaction_record" method="post" action={% url 'reviewerApp:add_txs' %}>{% csrf_token %}
+<div class="container">
+<div class="panel panel-primary col-md-13">
+  <div class="panel-heading">
+    <h3 class="panel-title">Add your transactions</h3>
+  </div>
+  <div class="panel-body text-center" >
+     <div id="container" class="container">
+  <form id="transaction_record" method="post" class="form-inline" action={% url 'reviewerApp:add_txs' %}>{% csrf_token %}
     <table id="myTable">
       <tr>
         <td id="myTd">
           <p><label>Transaction 0: </label>
-              <label for="time0" >Time:</label> <input type="date" name="time" id="time0">
-              <input type="radio" name="Pay0" value="pay" checked> <label >Pay </label>
-              <input type="radio" name="Pay0" value="gain"> <label >Gain </label>
-              <label for="amount0" >Amount:</label> <input type="number" name="amount" id="amount0">
-              <label for="tags0" >Tags(split by ;)</label> <input type="text" name="tags" id="tags0">
-              <label for="description0" >Memo:</label> <input type="text" name="description" id="description0">
-          </p>
+              <label for="time0" >Time:</label> <input type="date" name="time" id="time0" >
+              <input type="radio" name="Pay0" value="pay" checked > <label >Pay </label>
+              <input type="radio" name="Pay0" value="gain" > <label >Gain </label>
+              <input type="number" id="amount0" name="amount" placeholder="$12.3">
+              <label for="tags0" >Tags</label>
+              <select name="tags">
+                <option value="food" selected="selected">food</option>
+                <option value="necessities">necessities</option>
+                <option value="transportation" >transportation</option>
+                <option value="entertainment">entertainment</option>
+                <option value="education" >education</option>
+                <option value="investment">investment</option>
+                <option value="salary" >salary</option>
+                <option value="medical">medical</option>
+                <option value="other" >other</option>
+              </select>
+              <label for="description0" >Memo:</label> <input type="text" name="description" id="description0" value="">
+
+            </p>
         </td>
       </tr>
       <tr>
         <td>
-          <input id="addVar" type="button" value="add a transaction"/>
-          <input type="submit" value="submit" style="float:right"/>
+          <input id="addVar" type="button" value="add a transaction" class="form-control"/>
+          <input type="submit" value="submit"  class="form-control"/>
         </td>
       </tr>
     </table>
   </form>
 </div>
+  </div>
+</div>
+</div>
+
+
+
+
  <script>
      document.getElementById("time0").value = today;
  </script>
+</body>
+</html>
+
+
+

@@ -2,6 +2,7 @@
 from .dbconnector import *
 from .security import *
 import time
+from bson.objectid import ObjectId
 
 default_encryp_password = "zhudbencode1996"
 class stdDBIO:
@@ -107,6 +108,8 @@ class stdDBIO:
 
 
     def deleteWithObid(self,oid):
+        if isinstance(oid, str):
+            oid = ObjectId(oid)
         try:
             self.collection.delete_one({"_id": oid})
             self.operation["delete"]+=1

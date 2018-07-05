@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include "./header.html" %}
+    {% for jsfile_name in script_list %}
+        <script src="{{ host }}/{{ jsfile_name }}.js"></script>
+    {% endfor %}
+</head>
+<body>
+
+
+
+
+<div class="container">
+    <ul class="nav nav-tabs">
+        <li role="presentation"><a href="../">List View</a></li>
+        <li role="presentation"><a href="../engel/">Engel Index</a></li>
+        <li role="presentation"><a href="../category/">Category Summary</a></li>
+        <li role="presentation"><a href="../dynamic/">Monthly Dynamic</a></li>
+        <li role="presentation"><a href="../week3D/">Week3D</a></li>
+         <li role="presentation"><a href="../intro/">Introduction</a></li>
+        <li role="presentation" ><a role="button" class="btn btn-success" href="../record/">Add Record</a></li>
+    </ul>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{ title }}</h3>
+  </div>
+  <div class="panel-body text-center" style="height: 600px;">
+     {{ Viz|safe }}
+  </div>
+</div>
+    </div>
+
+
+</body>
+</html>
