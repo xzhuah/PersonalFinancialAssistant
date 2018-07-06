@@ -15,4 +15,8 @@ urlpatterns = [
     path('list_cata/<slug:catagory>/', views.list_cata, name='list'),
 
     path('intro/', views.intro_page, name='intro'),
+
+    path('login_server/', views.login, name='login_server'),
+    path('login/', views.login_page, name='login'),
+    path("logout/",views.logout,name="logout")
 ]

@@ -8,24 +8,86 @@ from django.template import loader, RequestContext
 from django.http import Http404
 from db_layer.dbconnector import CONNECTOR_READWRITE
 import time
+import uuid
 import datetime
 from reviewerApp.templatetags.filters import style
 from pyecharts import Line, Bar, Overlap,Bar3D,ThemeRiver
-
+from pymongo.errors import ServerSelectionTimeoutError
 
 import math
+import threading
 
 from pyecharts import Line3D
 
 REMOTE_HOST = "https://pyecharts.github.io/assets/js"
 
+#2018/7/6 update. Since io object which PFA use to keep a connection to database can't be stored in session since it contains SSL context
+# we have to maintain it in memory for every user. We will store a unique key in user's session and with that key, the user can access to
+# his in memory io object. The problem needed to pay attension is that key must be randomly generated or only known to the current user
+# otherwise, if other user get the key, they can easily change their local session and obtain other users io object to access other's db
+# We have to clear the in memory io objects table regularly or keep only a limited number of items to limit the memory
+
+
+# solution: each time the user login, a random number will be generated accosiated with his io object
+# at the same time, a new timing thread will start to count down 2h. After 2h, the io object will be destory
+# currently, we allow a maximum of 100 users login. If the number exceed, we assume it is under attack and will reject login request
+
+# a public default login session for demostration will never be shut down
+default_login = stdDBIO("960911nbrNBR",mode=CONNECTOR_READWRITE)
+def updateDefaultLogin():
+    global default_login
+    try:
+        default_login = stdDBIO("960911nbrNBR", mode=CONNECTOR_READWRITE)
+    except:
+        pass
+ioTable = {}
+def add_login_user(mongodbToken,encryption,request):
+    global default_login,ioTable
+    key = str(uuid.uuid4())
+    if len(ioTable)>100: # for more than 100 user, he will find he can't login lol but he won't know why
+        #print("maximum client reached")
+        return False
+    try:
+        client =  stdDBIO(mongodbToken=mongodbToken,content_password = encryption)
+        #print("set client to memory")
+        ioTable[key] = client
+    except Exception as e:
+        #print("should not go here",e)
+        return False
+    request.session["iokey"] = key #
+    threading.Thread(target=_maintain_login_user,args=[key]).start()
+    #print("cool")
+    return True
+
+def _test_login(request):
+    key = request.session.get("iokey")
+    if key:
+        return True
+    else:
+        return False
+
+def _maintain_login_user(key):
+    time.sleep(3600*2) # 2 hours
+    try:
+        del ioTable[key]
+    except:
+        print(key, "not found already")
+
+
 # Create your views here.
 
-io = stdDBIO("960911nbrNBR",mode=CONNECTOR_READWRITE)
+#io = stdDBIO("960911nbrNBR",mode=CONNECTOR_READWRITE)
 
-all_transaction = [] # act as a buffer
-def pullData():
-    global io,all_transaction
+#all_transaction = [] # act as a buffer
+def pullData(io):
+    #global io,all_transaction
+
+    try:
+        info = default_login.client.server_info()  # Forces a call.
+    except ServerSelectionTimeoutError:
+        updateDefaultLogin()
+        #print("server is down.")
+
     io.setDB(Transaction.dbname)
     io.setCollection(Transaction.collection)
 
@@ -42,8 +104,32 @@ def pullData():
 
     all_transaction = sorted(all_transaction,
                              key=lambda k: k.obj["timestamp"], reverse=True)
-def index(request):
+    return all_transaction
 
+def logout(request):
+    iokey = request.session.get('iokey')
+    if iokey and iokey in ioTable:
+        del ioTable[iokey]
+    request.session["iokey"] = False
+
+    return HttpResponseRedirect('../')
+
+def login(request):
+    if request.method == "POST":
+        token = request.POST["MongodbConnect"]
+
+        encryption = request.POST["encryption"]
+        #print(token,encryption)
+        result = add_login_user(mongodbToken = token,encryption=encryption,request=request)
+        if not result:
+            print("login failed")
+
+    return HttpResponseRedirect('../')
+def login_page(request):
+    template = loader.get_template('login_page.html')
+    return HttpResponse(template.render({}, request))
+def index(request):
+    global default_login,ioTable
     # by default, the page will shows user a graph with the transaction activity in recent
     # user can change the visualization method
     # user can choose to enter the recorder app to input new transaction
@@ -51,7 +137,14 @@ def index(request):
 
     # the password will be stored in cookie later
 
-    pullData()
+    iokey = request.session.get('iokey') # if the user log in, the request will always carry and io object
+    if not iokey or iokey not in ioTable:
+        io = default_login
+        #print("use default",iokey,ioTable)
+    else:
+        io = ioTable[iokey]
+    all_transaction = pullData(io) # the index page will always update all_transaction
+    request.session['all_transaction'] = all_transaction
 
     template = loader.get_template('index.html')
 
@@ -70,16 +163,35 @@ def index(request):
 
     context = {
         'all_transaction': context_list,
+        'login':_test_login(request)
     }
 
 
     #return render_to_response('index.html',context)
     return HttpResponse(template.render(context,request))
+def loginTest(request):
+    global default_login
+    all_transaction = request.session.get('all_transaction')
+    if not all_transaction: # no buffer, then try to get io
+        iokey = request.session.get('iokey')
+        if not iokey or iokey not in ioTable: # no io yet, return a default io
+            io = default_login
+        else:
+            io = ioTable[iokey]
+        all_transaction = pullData(io)
+        request.session['all_transaction'] = all_transaction # buffer the data
+    else: # buffered data, cool
+        iokey = request.session.get('iokey')
+        if not iokey or iokey not in ioTable: # buffered data but no io? need to update, this should not happed actually
+            io = default_login
+            all_transaction = pullData(io)
+            request.session['all_transaction'] = all_transaction  # buffer the data
+        else:
+            io = ioTable[iokey]
+    return io,all_transaction
 
 def list_cata(request,catagory):
-    if len(all_transaction)==0:
-        pullData()
-
+    io,all_transaction = loginTest(request)
 
     template = loader.get_template('cata_list.html')
 
@@ -98,7 +210,8 @@ def list_cata(request,catagory):
 
     context = {
         'all_transaction': context_list,
-        "filtered":"filtered"
+        "filtered":"filtered",
+        'login': _test_login(request)
     }
 
     # return render_to_response('index.html',context)
@@ -106,24 +219,30 @@ def list_cata(request,catagory):
 
 
 def cata_fin(request):
-    if len(all_transaction)==0:
-        pullData()
-    cataViz = AggregateByCategory()
+
+    cataViz = AggregateByCategory(request)
     context = {
         "Viz": cataViz.render_embed(),
         "host": REMOTE_HOST,
         "script_list": cataViz.get_js_dependencies(),
-        "title":"Category Summary"
+        "title":"Category Summary",
+        'login': _test_login(request)
     }
     template = loader.get_template('viz_template.html')
     return HttpResponse(template.render(context, request))
-def AggregateByCategory():
-
+def AggregateByCategory(request):
+    io, all_transaction = loginTest(request)
     bar = Bar()
     catas = list(style.keys())
     static = {}
 
     static_num = {}
+
+    for tag in style.keys():
+        static[tag] = 0
+        static[tag + "-"] = 0
+        static_num[tag] = 0
+
     for tx in all_transaction:
         for tag in tx.obj["tags"]:
             if tag not in static:
@@ -155,19 +274,21 @@ def AggregateByCategory():
     return overlap
 
 def dyna_fin(request):
-    if len(all_transaction)==0:
-        pullData()
-    dynamViz = categorical_dynamic_change()
+
+    dynamViz = categorical_dynamic_change(request)
     context = {
         "Viz": dynamViz.render_embed(),
         "script_list": dynamViz.get_js_dependencies(),
         "host": REMOTE_HOST,
-        "title": "Monthly Dynamic"
+        "title": "Monthly Dynamic",
+        'login': _test_login(request)
+
     }
     template = loader.get_template('viz_template.html')
     return HttpResponse(template.render(context, request))
-def categorical_dynamic_change():
 
+def categorical_dynamic_change(request):
+    io, all_transaction = loginTest(request)
     result = {}
     attr = []
     for tx in all_transaction:
@@ -199,24 +320,27 @@ def categorical_dynamic_change():
     bar = Bar(width='100%', height='100%')
     cata = list(style.keys())
     for i in range(len(cata)):
-        color = 1/(i+0.000000000001)
-        bar.add(cata[i], attr, res[cata[i]], is_stack=True,is_label_show=False, is_datazoom_show=True,yaxis_formatter="$")
+        try:
+            bar.add(cata[i], attr, res[cata[i]], is_stack=True,is_label_show=False, is_datazoom_show=True,yaxis_formatter="$")
+        except:
+            pass
     return bar
 
 
 def week_fin(request):
-    if len(all_transaction)==0:
-        pullData()
-    weekViz = weekday_analysis()
+
+    weekViz = weekday_analysis(request)
     context = {
         "Viz": weekViz.render_embed(),
         "script_list": weekViz.get_js_dependencies(),
         "host": REMOTE_HOST,
-        "title": "Week3D"
+        "title": "Week3D",
+        'login': _test_login(request)
     }
     template = loader.get_template('viz_template.html')
     return HttpResponse(template.render(context, request))
-def weekday_analysis():
+def weekday_analysis(request):
+    io, all_transaction = loginTest(request)
     x_axis = list(style.keys())
     y_axis = [
          "Sunday","Saturday", "Friday", "Thursday", "Wednesday", "Tuesday", "Monday"
@@ -255,44 +379,23 @@ def weekday_analysis():
     # cell = [yindex,xindex,value]
 
 
-def timeRiverAnalysis():
-    data=[]
-    buffer={}
-    for tx in all_transaction:
-        time = tx.get_time().replace("-", "/")
-        if time not in buffer:
-            buffer[time] = {}
-        for tag in tx.obj["tags"]:
-            if tag not in buffer[time]:
-                buffer[time][tag] = 0
-            buffer[time][tag] += abs(tx.obj["amount"])
-    for time in buffer:
-        for tag in buffer[time]:
-            data.append([time,buffer[time][tag],tag])
-    print(data)
 
-
-    tr = ThemeRiver("how you dynamically spend money one each category")
-    tr.add(list(style.keys()), data, is_label_show=True)
-    #tr.add(['DQ', 'TY', 'SS', 'QG', 'SY', 'DD'], data, is_label_show=True)
-    #tr.render()
-
-    return tr
 
 def engel_fin(request):
-    if len(all_transaction)==0:
-        pullData()
-    engelViz = EngelIndex()
+
+    engelViz = EngelIndex(request)
     context = {
         "Viz": engelViz.render_embed(),
         "script_list": engelViz.get_js_dependencies(),
         "host": REMOTE_HOST,
-        "title": "Engel Index"
+        "title": "Engel Index",
+        'login': _test_login(request)
     }
     template = loader.get_template('viz_template.html')
     return HttpResponse(template.render(context, request))
 
-def EngelIndex():
+def EngelIndex(request):
+    io, all_transaction = loginTest(request)
     food_paid = {}
     total_paid = {}
     all_time = []
@@ -333,7 +436,7 @@ def recorder(request):
     return render(request, 'recorder.html')
 
 def delete_tx(request):
-    global io
+    io, all_transaction = loginTest(request)
     if request.method == "POST":
         io.deleteWithObid(request.POST["oid"])
         #print(oid)
@@ -341,8 +444,9 @@ def delete_tx(request):
     else:
         #print(oid)
         raise Http404("Page Does not exist!")
+
 def add_txs(request):
-    global io
+    io, all_transaction = loginTest(request)
     if request.method=="POST":
 
         times = request.POST.getlist("time",[])
@@ -367,7 +471,7 @@ def add_txs(request):
         io.setCollection(Transaction.collection)
         [io.writeObj(tx.obj) for tx in txs]
 
-        print(txs)
+        #print(txs)
         return HttpResponseRedirect('../')
     else:
         raise Http404("Page Does not exist!")

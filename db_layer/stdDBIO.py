@@ -7,9 +7,11 @@ from bson.objectid import ObjectId
 default_encryp_password = "zhudbencode1996"
 class stdDBIO:
 
-    def __init__(self,password,content_password = default_encryp_password,mode = CONNECTOR_READONLY, username = ""):
-        self.client = getClient(password,type=mode,username=username)
-
+    def __init__(self,password="",content_password = default_encryp_password,mode = CONNECTOR_READONLY, username = "",mongodbToken=""):
+        try:
+            self.client = getClient(password=password,type=mode,username=username,loginFull=mongodbToken)
+        except Exception as e:
+            raise e
         # you can reach to your own client by the following if you have your own username and password
         #self.client = pymongo.MongoClient(
            # "mongodb+srv://{0}:{1}@cluster0-jghyh.mongodb.net/test?retryWrites=true".format(username,
@@ -83,7 +85,8 @@ class stdDBIO:
                 q["content"]=d_obj(self.content_password,q["content"])
                 result.append(q)
             except:
-                result.append({"_id":q["_id"]})
+                #result.append({"_id":q["_id"]})
+                continue # it will only return those successfully decrypted so that the db is shareable
 
         self.operation["read"] += len(result)
         return result
@@ -94,7 +97,7 @@ class stdDBIO:
             try:
                 yield d_obj(self.content_password,q["content"])
             except:
-                yield {"_id":q["_id"]}
+                #yield {"_id":q["_id"]}
                 continue
 
 

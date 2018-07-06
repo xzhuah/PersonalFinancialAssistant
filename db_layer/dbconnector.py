@@ -3,7 +3,16 @@ from .security import decrypt_obj,getKey
 CONNECTOR_READONLY = 0x12345678
 CONNECTOR_READWRITE = 0x87654321
 
-def getClient(password,username="",type = CONNECTOR_READONLY,):
+def getClient(password="",username="",type = CONNECTOR_READONLY,loginFull = ""):
+    if loginFull!="":
+        try:
+            client = pymongo.MongoClient(loginFull)
+            info = client.server_info()
+
+        except Exception as err:
+            print(err)
+            raise err
+        return client
     try:
         if type == CONNECTOR_READONLY:
             login = decrypt_obj(getKey(password),"readMode.pkl")

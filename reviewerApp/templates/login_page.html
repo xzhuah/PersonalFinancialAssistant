@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   {% include "./header.html" %}
+    <title>Login</title>
+</head>
+<body>
+
+<div class="jumbotron">
+
+  <div class="container">
+      <h1>Totally free, open source and secure</h1>
+<form method="post" action="../login_server/">{% csrf_token %}
+
+ <div class="form-group">
+    <label for="MongodbConnect" >Mongodb Connection Code</label><input class="form-control" type="text" name="MongodbConnect" placeholder="mongodb+srv://<mongodbName>:<PASSWORD>@??????.mongodb.net/test?retryWrites=true" required="required"/>
+    </div>
+
+    <div class="form-group">
+     <label for="password" >Database Encryption Password</label><input class="form-control" type="text" name="encryption" placeholder="your own token" required="required"/>
+       </div>
+        <input class="form-control btn btn-primary" type="submit" name="submit" value="Login"/>
+
+</form>
+      <br>
+      <a class="btn btn-primary btn-lg" href="#secure_explain" role="button">Why open source but secure?</a>
+</div>
+
+</div>
+<div class="container">
+<div class="page-header">
+  <h1>First time user ?<small>Quick Start Here!</small></h1>
+
+</div>
+    <div class="jumbotron">
+  <h2>Mongodb Connection Code</h2>
+  <p>Personal Financial Assistant is more like an interface rather than a
+      typical web application. It do not have its database behind. But surprisingly that is why PFA is
+      <strong>powerful</strong>! As long as user provide a mongodb connection code, PFA can instantly
+  connect to that mongodb and work for the user. MongoDB Atlas does provide free online database service and
+  general user can apply for a free account from them. For personal usage, the free account is more than enough
+  for PFA but if you want, you can buy an advanced account from mongodb altas</p>
+        <br>
+        <p>If PFA is built on its own database, it will not be able to handle endless user requests. But now
+        it act as an interface between you and your own database. One user, one database, not network congestion,
+        not database space limit. With PFA, you are always enjoying the best of the best!</p>
+
+        <h2>Instruction on getting you code</h2>
+    <div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Get Your online database</h3>
+  </div>
+  <div class="panel-body">
+    Go to Mongodb Altas, and follow their instruction to get your own online database
+  </div>
+
+</div>
+          <p><a class="btn btn-primary btn-lg" href="https://www.mongodb.com/cloud/atlas" target="_blank" role="button">Get Your Code for free</a></p>
+
+
+        <div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Add a user with read and write priority</h3>
+  </div>
+  <div class="panel-body">
+    <img src="https://i.imgur.com/3DRunnY.png"/>
+      Remember to allow all ip address in IP Whitelist
+  </div>
+
+</div>
+
+           <div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Get your code</h3>
+  </div>
+  <div class="panel-body">
+
+      At Cluster, click connect-->Connect Your Application-->I am using driver 3.6 or later. Copy the SRV address and replace the password with your own password. That will be your Mongodb Connection Code
+        <img src="https://i.imgur.com/muwMf1E.png" />
+  </div>
+
+</div>
+
+
+        <h2 id="secure_explain">Database Encryption Password</h2>
+        <p>Mongodb Altas is public, it is possible that someone else may somehow break into your database and read everything their although the probability
+        is very very low.
+
+        But with Database Encryption Password, you won't need to worry about that since all your data in the database
+        are encrypted by this code.
+
+        We do not store the code for you so remember it by yourself. We believe this is the safest way to protect your
+        personal privacy.
+
+        Just input any password you like and can remember, and keep using that<p>
+
+         <div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">What if you forget your Password</h3>
+  </div>
+  <div class="panel-body">
+
+      Sorry for that, we can't help you. But you can use a new password. Every time, you can login with any password you want and
+      only those data encrypted by this password will be presented to you! That means, you can share the Mongodb Connection Code with your family
+      and keep your own Database Encryption Password. (Although we encourage you to use a fixed Database Encryption Password since to test which
+      data is encrypted by your current password cost time)
+  </div>
+
+
+
+  </div>
+
+
+          <div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">No correct or wrong</h3>
+  </div>
+  <div class="panel-body">
+
+      As explained above, you will find you can access to the service with any Database Encryption Password. If you find your
+      data is not there after login, it is likely that you typed in a different password. You can by yourself, to maintain two different password for different purpose.
+      Under that case, you will see two set of data.
+  </div>
+
+
+
+  </div>
+           <h2>Login Failed</h2>
+        <p>If you failed to login, you will by default connect to a public demo database. The login button will still be there for you to login
+        </p>
+        <p>
+            The only reason for login failure is an incorrect Mongodb Connection Code, check it please, if you can connect to your database with other
+            application like mongodb compass, you should be able to connect to it with PFA
+        </p>
+
+</div>
+
+</div>
+
+</body>
+
+
+
+</body>
+</html>

@@ -20,6 +20,13 @@
         <li role="presentation"><a href="../week3D/">Week3D</a></li>
          <li role="presentation"><a href="../intro/">Introduction</a></li>
         <li role="presentation" ><a role="button" class="btn btn-success" href="../record/">Add Record</a></li>
+        {% if login %}
+          <li role="presentation" ><a role="button" class="btn btn-warning" href="../logout/">Logout</a></li>
+
+        {% else %}
+            <li role="presentation" ><a role="button" class="btn btn-primary" href="../login/">Login</a></li>
+
+        {% endif %}
     </ul>
 
 <div class="panel panel-primary">

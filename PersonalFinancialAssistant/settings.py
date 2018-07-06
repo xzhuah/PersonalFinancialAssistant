@@ -71,7 +71,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'PersonalFinancialAssistant.wsgi.application'
 
-
+# set the session to file based
+SESSION_ENGINE = "django.contrib.sessions.backends.file"
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
