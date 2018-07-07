@@ -27,7 +27,7 @@ var today = year + "-" + month + "-" + day;
         var varCount = 1;
         $(function () {
             $('#addVar').on('click', function(){
-                $node = String.format('<p><label>Transaction {0}: </label>               <label for="time{0}" >Time:</label> <input type="date" name="time" id="time{0}" value="{1}">               <input type="radio" name="Pay{0}" value="pay" checked > <label >Pay </label>               <input type="radio" name="Pay{0}" value="gain" > <label >Gain </label>               <input type="number" id="amount{0}" name="amount" placeholder="$12.3">               <label for="tags{0}" >Tags</label>               <select name="tags">                 <option value="food" selected="selected">food</option>                 <option value="necessities">necessities</option>                 <option value="transportation" >transportation</option>                 <option value="entertainment">entertainment</option>                 <option value="education" >education</option>                 <option value="investment">investment</option>                 <option value="salary" >salary</option>                 <option value="medical">medical</option>                 <option value="other" >other</option>               </select>               <label for="description{0}" >Memo:</label> <input type="text" name="description" id="description{0}" value="">              </p>',varCount,today);
+                $node = String.format('<p><label>Transaction {0}: </label>               <label for="time{0}" >Time:</label> <input type="date" name="time" id="time{0}" value="{1}">               <input type="radio" name="Pay{0}" value="pay" checked > <label >Pay </label>               <input type="radio" name="Pay{0}" value="gain" > <label >Gain </label>               <input type="number" id="amount{0}" name="amount" placeholder="$123">               <label for="tags{0}" >Tags</label>               <select name="tags">                 <option value="food" selected="selected">food</option>                 <option value="necessities">necessities</option>                 <option value="transportation" >transportation</option>                 <option value="entertainment">entertainment</option>                 <option value="education" >education</option>                 <option value="investment">investment</option>                 <option value="salary" >salary</option>                 <option value="medical">medical</option>                 <option value="other" >other</option>               </select>               <label for="description{0}" >Memo:</label> <input type="text" name="description" id="description{0}" value="">              </p>',varCount,today);
                 varCount++;
                 $("#myTd").append($node);
             });
@@ -51,7 +51,7 @@ var today = year + "-" + month + "-" + day;
               <label for="time0" >Time:</label> <input type="date" name="time" id="time0" >
               <input type="radio" name="Pay0" value="pay" checked > <label >Pay </label>
               <input type="radio" name="Pay0" value="gain" > <label >Gain </label>
-              <input type="number" id="amount0" name="amount" placeholder="$12.3">
+              <input type="number" id="amount0" name="amount" placeholder="$123">
               <label for="tags0" >Tags</label>
               <select name="tags">
                 <option value="food" selected="selected">food</option>
