@@ -1,6 +1,6 @@
 # PersonalFinancialAssistant
 
-<a href="http://ec2-34-219-176-112.us-west-2.compute.amazonaws.com:8000/review/">Visit the website here</a>
+<a href="http://www.andrew.cmu.edu/user/xinyuzhu/pfa.html">Visit the website here</a>
 
 
 ## Description
